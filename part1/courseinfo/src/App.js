@@ -1,11 +1,15 @@
 const Header = (props) => (
         <h1>Course: {props.name}</h1>
 )
+const Part = (props) => (
+        <p>{props.name}: {props.numExercises}</p>
+)
+
 const Content = (props) => {
         return (
                 <>
                 {props.parts.map(part => (
-                        <p>{part.name}: {part.numExercises}</p>
+                        <Part name={part.name} numExercises={part.numExercises} />
                 ))}
                 </>
         );
