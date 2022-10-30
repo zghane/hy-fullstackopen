@@ -9,9 +9,15 @@ const App = () => {
         const addPerson = (event) => {
                 // prevent form submission / page reload
                 event.preventDefault()
+                // is the name new? (allow each person only once)
+                if (!persons.map(person => person.name).includes(newName)) {
                 const newPerson = {name: newName}
-                setPersons(persons.concat(newPerson))
-                setNewName("")
+                        setPersons(persons.concat(newPerson))
+                        setNewName("")
+                }
+                else {
+                        alert(`${newName} is already added to the phonebook`)
+                }
         }
         const handleNameFormChange = (event) => {
                 setNewName(event.target.value)
