@@ -1,5 +1,4 @@
 import { useState, useEffect} from 'react'
-import axios from "axios"
 import personService from "./services/persons"
 import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
@@ -34,20 +33,33 @@ const App = () => {
                         personService.create(newPerson).then(returnedPerson => {
                                 setPersons(persons.concat(returnedPerson))
                         })
-                        setNewName("")
-                        setNewNumber("")
                 }
+                // if naem already exists, update the phone number
                 else {
-                        alert(`${newName} is already added to the phonebook`)
+                        updatePerson(persons.find(p => p.name === newName).id, newNumber)
                 }
+                setNewName("")
+                setNewNumber("")
         }
         const deletePerson = (id) => {
-                // attempt to remove the person and update person list
-                personService.remove(id).then(response => {
-                        setPersons(persons.filter(person => person.id !== id))
-                })
+                if (window.confirm(`Really delete the person?`)) {
+                        // attempt to remove the person and update person list
+                        personService.remove(id).then(response => {
+                                setPersons(persons.filter(person => person.id !== id))
+                        })
+                }
         }
+        // update person's phone number
+        const updatePerson = (id, updatedNumber) => {
+                const person = persons.find(p => p.id === id)
+                const changedPerson = {...person, number: updatedNumber}
 
+                if (window.confirm(`${person.name} is already in the phonebook, replace the old number with a new one?`)) {
+                        personService.update(id, changedPerson).then(returnedPerson => {
+                                setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
+                        })
+                }
+        }
 
         // set the initial list of persons
         useEffect(() => {
