@@ -10,9 +10,9 @@ const Header = ({text}) => {
                 <h1>{text}</h1>
         )
 }
-const StatisticsItem = ({name, value, symbol=""}) => {
+const StatisticsLine = ({text, value, symbol=""}) => {
         return (
-                <p>{name}: {value} {symbol}</p>
+                <p>{text}: {value} {symbol}</p>
         )
 }
 const Statistics = ({good, neutral, bad}) => {
@@ -26,12 +26,12 @@ const Statistics = ({good, neutral, bad}) => {
                 return (
                         <div>
                         <Header text="statistics" />
-                        <StatisticsItem name="good" value={good} />
-                        <StatisticsItem name="neutral" value={neutral} />
-                        <StatisticsItem name="bad" value={bad} />
-                        <StatisticsItem name="total" value={total} />
-                        <StatisticsItem name="average" value={average} />
-                        <StatisticsItem name="positive" value={percentPositive}/>
+                        <StatisticsLine text="good" value={good} />
+                        <StatisticsLine text="neutral" value={neutral} />
+                        <StatisticsLine text="bad" value={bad} />
+                        <StatisticsLine text="total" value={total} />
+                        <StatisticsLine text="average" value={average} />
+                        <StatisticsLine text="positive" value={percentPositive}/>
                         </div>
                 )
         }
