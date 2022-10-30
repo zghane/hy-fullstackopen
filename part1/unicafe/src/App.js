@@ -19,15 +19,12 @@ const Statistics = ({good, neutral, bad}) => {
         var total = good + neutral + bad
         // feedback scores:
         // good = 1, neutral = 0, bad = -1
-        var average = 0.00
+        var average = (((good * 1) + (neutral * 0) + (bad * -1))/total).toFixed(2)
         // % of positive feedback of total feedback
-        var percentPositive = 0.00
+        var percentPositive = (good/total).toFixed(2)
         if (total > 0) {
-                var average = (((good * 1) + (neutral * 0) + (bad * -1))/total).toFixed(2)
-                var percentPositive = (good/total).toFixed(2)
-        }
-        return (
-                <div>
+                return (
+                        <div>
                         <Header text="statistics" />
                         <StatisticsItem name="good" value={good} />
                         <StatisticsItem name="neutral" value={neutral} />
@@ -35,8 +32,16 @@ const Statistics = ({good, neutral, bad}) => {
                         <StatisticsItem name="total" value={total} />
                         <StatisticsItem name="average" value={average} />
                         <StatisticsItem name="positive" value={percentPositive}/>
-                </div>
-        )
+                        </div>
+                )
+        }
+        else {
+                return (
+                        <div>
+                        <p>No feedback given</p>
+                        </div>
+                )
+        }
 }
 const App = () => {
         // save clicks of each button to its own state
@@ -54,18 +59,18 @@ const App = () => {
                 setBad(bad + 1)
         }
 
-            
+
         return (
                 <div>
-                        <div>
-                            <Header text="give feedback" />
-                            <Button onClick={incrementGood} text="good" />
-                            <Button onClick={incrementNeutral} text="neutral" />
-                            <Button onClick={incrementBad} text="bad" />
-                        </div>
-                        <div>
-                            <Statistics good={good} neutral={neutral} bad={bad} />
-                        </div>
+                <div>
+                <Header text="give feedback" />
+                <Button onClick={incrementGood} text="good" />
+                <Button onClick={incrementNeutral} text="neutral" />
+                <Button onClick={incrementBad} text="bad" />
+                </div>
+                <div>
+                <Statistics good={good} neutral={neutral} bad={bad} />
+                </div>
                 </div>
 
         )
