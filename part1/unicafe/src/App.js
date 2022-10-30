@@ -12,7 +12,7 @@ const Header = ({text}) => {
 }
 const StatisticsLine = ({text, value, symbol=""}) => {
         return (
-                <p>{text}: {value} {symbol}</p>
+                <tr><td>{text}</td><td>{value}{symbol}</td></tr>
         )
 }
 const Statistics = ({good, neutral, bad}) => {
@@ -21,17 +21,21 @@ const Statistics = ({good, neutral, bad}) => {
         // good = 1, neutral = 0, bad = -1
         var average = (((good * 1) + (neutral * 0) + (bad * -1))/total).toFixed(2)
         // % of positive feedback of total feedback
-        var percentPositive = (good/total).toFixed(2)
+        var percentPositive = ((good*100)/total).toFixed(2)
         if (total > 0) {
                 return (
                         <div>
-                        <Header text="statistics" />
-                        <StatisticsLine text="good" value={good} />
-                        <StatisticsLine text="neutral" value={neutral} />
-                        <StatisticsLine text="bad" value={bad} />
-                        <StatisticsLine text="total" value={total} />
-                        <StatisticsLine text="average" value={average} />
-                        <StatisticsLine text="positive" value={percentPositive}/>
+                                <Header text="statistics" />
+                                <table>
+                                        <tbody>
+                                                <StatisticsLine text="good" value={good} />
+                                                <StatisticsLine text="neutral" value={neutral} />
+                                                <StatisticsLine text="bad" value={bad} />
+                                                <StatisticsLine text="total" value={total} />
+                                                <StatisticsLine text="average" value={average}/>
+                                                <StatisticsLine text="positive" value={percentPositive} symbol="%" />
+                                        </tbody>
+                                </table>
                         </div>
                 )
         }
