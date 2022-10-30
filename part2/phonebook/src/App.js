@@ -26,21 +26,28 @@ const App = () => {
         }
 
         const addPerson = (event) => {
-                        // prevent form submission / page reload
-                        event.preventDefault()
-                        // is the name new? (allow each person only once)
-                        if (!persons.map(person => person.name).includes(newName)) {
-                                const newPerson = {name: newName, number: newNumber}
-                                personService.create(newPerson).then(returnedPerson => {
+                // prevent form submission / page reload
+                event.preventDefault()
+                // is the name new? (allow each person only once)
+                if (!persons.map(person => person.name).includes(newName)) {
+                        const newPerson = {name: newName, number: newNumber}
+                        personService.create(newPerson).then(returnedPerson => {
                                 setPersons(persons.concat(returnedPerson))
-                                })
-                                setNewName("")
-                                setNewNumber("")
-                        }
-                        else {
-                                alert(`${newName} is already added to the phonebook`)
-                        }
+                        })
+                        setNewName("")
+                        setNewNumber("")
                 }
+                else {
+                        alert(`${newName} is already added to the phonebook`)
+                }
+        }
+        const deletePerson = (id) => {
+                // attempt to remove the person and update person list
+                personService.remove(id).then(response => {
+                        setPersons(persons.filter(person => person.id !== id))
+                })
+        }
+
 
         // set the initial list of persons
         useEffect(() => {
@@ -58,7 +65,7 @@ const App = () => {
                         <h2>Numbers</h2>
                         <h3>Add a new</h3>
                         <PersonForm onSubmit={addPerson} newName={newName} onChangeName={handleNameFormChange} newNumber={newNumber} onChangeNumber={handleNumberFormChange} />
-                        <Persons personArray={filterPersons(persons)} />
+                        <Persons personArray={filterPersons(persons)} onClickDelete={deletePerson} />
                 </div>
         )
 }
