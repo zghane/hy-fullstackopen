@@ -10,18 +10,31 @@ const Header = ({text}) => {
                 <h1>{text}</h1>
         )
 }
-const StatisticsItem = ({name, value}) => {
+const StatisticsItem = ({name, value, symbol=""}) => {
         return (
-                <p>{name}: {value}</p>
+                <p>{name}: {value} {symbol}</p>
         )
 }
 const Statistics = ({good, neutral, bad}) => {
+        var total = good + neutral + bad
+        // feedback scores:
+        // good = 1, neutral = 0, bad = -1
+        var average = 0.00
+        // % of positive feedback of total feedback
+        var percentPositive = 0.00
+        if (total > 0) {
+                var average = (((good * 1) + (neutral * 0) + (bad * -1))/total).toFixed(2)
+                var percentPositive = (good/total).toFixed(2)
+        }
         return (
                 <div>
                         <Header text="statistics" />
                         <StatisticsItem name="good" value={good} />
                         <StatisticsItem name="neutral" value={neutral} />
                         <StatisticsItem name="bad" value={bad} />
+                        <StatisticsItem name="total" value={total} />
+                        <StatisticsItem name="average" value={average} />
+                        <StatisticsItem name="positive" value={percentPositive}/>
                 </div>
         )
 }
