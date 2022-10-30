@@ -1,5 +1,6 @@
 import { useState, useEffect} from 'react'
 import axios from "axios"
+import personService from "./services/persons"
 import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
@@ -10,20 +11,6 @@ const App = () => {
         const [newNumber, setNewNumber] = useState("")
         const [filterString, setFilterString] = useState("")
 
-        const addPerson = (event) => {
-                // prevent form submission / page reload
-                event.preventDefault()
-                // is the name new? (allow each person only once)
-                if (!persons.map(person => person.name).includes(newName)) {
-                const newPerson = {name: newName, number: newNumber}
-                        setPersons(persons.concat(newPerson))
-                        setNewName("")
-                        setNewNumber("")
-                }
-                else {
-                        alert(`${newName} is already added to the phonebook`)
-                }
-        }
         const handleNameFormChange = (event) => {
                 setNewName(event.target.value)
         }
@@ -38,11 +25,28 @@ const App = () => {
                         person.name.toLowerCase().includes(filterString.toLowerCase()))
         }
 
+        const addPerson = (event) => {
+                        // prevent form submission / page reload
+                        event.preventDefault()
+                        // is the name new? (allow each person only once)
+                        if (!persons.map(person => person.name).includes(newName)) {
+                                const newPerson = {name: newName, number: newNumber}
+                                personService.create(newPerson).then(returnedPerson => {
+                                setPersons(persons.concat(returnedPerson))
+                                })
+                                setNewName("")
+                                setNewNumber("")
+                        }
+                        else {
+                                alert(`${newName} is already added to the phonebook`)
+                        }
+                }
+
+        // set the initial list of persons
         useEffect(() => {
-                axios
-                        .get("http://localhost:3001/persons")
-                        .then(response => {
-                                setPersons(response.data)
+                personService.getAll()
+                        .then(initialPersons => {
+                                setPersons(initialPersons)
                         })
         }, [])
                         
