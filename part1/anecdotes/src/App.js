@@ -10,7 +10,7 @@ const App = () => {
                 'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.',
                 'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when dianosing patients.'
         ]
-        const [selected, setSelected] = useState("")
+        const [selected, setSelected] = useState(0)
         const [points, setPoints] = useState({})
 
         const Button = ({onClick, text}) => {
@@ -18,20 +18,35 @@ const App = () => {
                         <button onClick={onClick}>{text}</button>
                 )
         }
-        // select random element from array
+        // select random index of array
         const selectRandom = (arr) => {
-            return arr[Math.floor(Math.random() * arr.length)]
+            return Math.floor(Math.random() * arr.length)
         } 
         const chooseAnecdote = () => {
             setSelected(selectRandom(anecdotes))
+        }
+        // increment votes for the currently selected/shown anecdote
+        const incrementPoints = () => {
+            const newPoints = {...points}
+            if (newPoints[selected]) {
+                    newPoints[selected] += 1
+            }
+            else {
+                    newPoints[selected] = 1
+            }
+            setPoints(newPoints)
+            console.log(points)
+                
         }
 
 
 
         return (
                 <div>
-                <p>{selected}</p>
+                <p>{anecdotes[selected]}</p>
+                <p>has {points[selected] ? points[selected] : 0} votes</p>
                 <Button onClick={chooseAnecdote} text="next anecdote" />
+                <Button onClick={incrementPoints} text="vote" />
                 </div>
         )
 }
