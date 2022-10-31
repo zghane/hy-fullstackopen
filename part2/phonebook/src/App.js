@@ -3,12 +3,16 @@ import personService from "./services/persons"
 import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
+import Notification from "./components/Notification"
+
+import "./index.css"
 
 const App = () => {
         const [persons, setPersons] = useState([]) 
         const [newName, setNewName] = useState("")
         const [newNumber, setNewNumber] = useState("")
         const [filterString, setFilterString] = useState("")
+        const [notification, setNotification] = useState("")
 
         const handleNameFormChange = (event) => {
                 setNewName(event.target.value)
@@ -33,6 +37,7 @@ const App = () => {
                         personService.create(newPerson).then(returnedPerson => {
                                 setPersons(persons.concat(returnedPerson))
                         })
+                        displayNotification(`Added ${newPerson.name}`)
                 }
                 // if naem already exists, update the phone number
                 else {
@@ -47,6 +52,7 @@ const App = () => {
                         personService.remove(id).then(response => {
                                 setPersons(persons.filter(person => person.id !== id))
                         })
+                        displayNotification(`Person deleted`)
                 }
         }
         // update person's phone number
@@ -58,7 +64,15 @@ const App = () => {
                         personService.update(id, changedPerson).then(returnedPerson => {
                                 setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
                         })
+                        displayNotification(`updated ${person.name}'s number to ${updatedNumber}`)
                 }
+        }
+        // display notification with message for time ms
+        const displayNotification = (message, time=3000) => {
+                setNotification(message)
+                setTimeout(() => {
+                        setNotification(null)
+                }, time)
         }
 
         // set the initial list of persons
@@ -73,6 +87,7 @@ const App = () => {
         return (
                 <div>
                         <h2>Phonebook</h2>
+                        <Notification message={notification} />
                         <Filter filterString={filterString} onChange={handleFilterFormChange} />
                         <h2>Numbers</h2>
                         <h3>Add a new</h3>
