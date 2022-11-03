@@ -2,8 +2,7 @@ const express = require("express")
 const app = express()
 const cors = require("cors")
 const mongoose = require("mongoose")
-require("dotenv").config()
-
+const config = require("./utils/config")
 const blogSchema = mongoose.Schema({
         title: String,
         author: String,
@@ -13,9 +12,7 @@ const blogSchema = mongoose.Schema({
 
 const Blog = mongoose.model("Blog", blogSchema)
 
-const mongoURI = process.env.MONGODB_URI
-console.log("connecting using", mongoURI)
-mongoose.connect(mongoURI)
+mongoose.connect(config.MONGODB_URI)
 
 app.use(cors())
 app.use(express.json())
