@@ -76,7 +76,43 @@ const mostBlogs = (blogs) => {
                 return null
         }
 }
-            
+
+
+// return the amount of likes each author has, given a list of blogs
+const authorLikeCounts = (blogs) => {
+        if (blogs && blogs.length > 0) {
+                // TODO: a more efficient solution is likely possible
+                // this iterates the array way too many times
+                //
+                // get list of unique authors
+                const authors = [... new Set(blogs.map(blog => blog.author))]
+                // author and their like counts
+                const authorLikes = {}
+                for (var i = 0; i < authors.length; i++) {
+                    authorLikes[authors[i]] = blogs.filter(blog => blog.author === authors[i]).reduce( (sum, blog) => sum + blog.likes, 0)
+                }
+                return authorLikes
+                     
+        }
+        else {
+                return null
+        }
+}
+
+// return the author who has largest amount of likes, given a list of blogs
+const mostLikes = (blogs) => {
+        if (blogs && blogs.length > 0) {
+                const likeCounts = authorLikeCounts(blogs)
+                const mostLikesAuthor = Object.keys(likeCounts).reduce((author1, author2) => likeCounts[author1] > likeCounts[author2] ? author1 : author2)
+                return {
+                        author: mostLikesAuthor,
+                        likes: likeCounts[mostLikesAuthor]
+                }
+        }
+        else {
+                return null
+        }
+}
 
 
 module.exports = {
@@ -85,5 +121,7 @@ module.exports = {
         favoriteBlog,
         formatBlog,
         authorPostCounts,
-        mostBlogs
+        mostBlogs,
+        authorLikeCounts,
+        mostLikes
 }
