@@ -31,7 +31,6 @@ app.post("/api/blogs", (request, response) => {
         blog
                 .save()
                 .then(result => {
-                        console.log("received ", request.body)
                         response.status(201).json(result)
                 })
 })
