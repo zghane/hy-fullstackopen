@@ -60,6 +60,25 @@ test("a blog can be added and content matches after addition", async () => {
         expect(formattedBlogs).toContainEqual(newBlog)
 })
 
+// test that likes always gets a value, by default 0 if not supplied
+test("an added blog has default value for likes", async () => {
+        const newBlog = {
+                title: "Type wars",
+                author: "Robert C. Martin",
+                url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+        }
+        
+        await api
+        .post("/api/blogs").send(newBlog)
+        .expect(201)
+        .expect("Content-Type", /application\/json/)
+
+        const blogsAfterAddition = await testHelper.blogsInDb()
+        const addedBlog = await blogsAfterAddition.find(blog => blog.url === newBlog.url)
+        expect(addedBlog.likes).toBeDefined()
+        expect(addedBlog.likes).toBe(0)
+})
+
 afterAll(() => {
         mongoose.connection.close()
 })
