@@ -78,6 +78,19 @@ test("all blogs are returned", async () => {
         expect(response.body).toHaveLength(initialBlogs.length)
 })
 
+// test that added blog post has an id, if not specified
+test("a blog post has id", async () => {
+        const newBlog = {
+                title: "Space War",
+                author: "Robert C. Martin",
+                url: "https://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html",
+                likes: 50
+        }
+        const response = await api.post("/api/blogs", newBlog)
+        console.log(response.body)
+        expect(response.body.id).toBeDefined()
+})
+
 afterAll(() => {
         mongoose.connection.close()
 })
