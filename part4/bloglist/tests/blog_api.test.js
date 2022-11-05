@@ -2,66 +2,16 @@ const mongoose = require("mongoose")
 const supertest = require("supertest")
 const app = require("../app")
 const Blog = require("../models/blog")
-
+const testHelper = require("./test_helper")
 const api = supertest(app)
 
-const initialBlogs = [
-        {
-                _id: "5a422a851b54a676234d17f7",
-                title: "React patterns",
-                author: "Michael Chan",
-                url: "https://reactpatterns.com/",
-                likes: 7,
-                __v: 0
-        },
-        {
-                _id: "5a422aa71b54a676234d17f8",
-                title: "Go To Statement Considered Harmful",
-                author: "Edsger W. Dijkstra",
-                url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
-                likes: 5,
-                __v: 0
-        },
-        {
-                _id: "5a422b3a1b54a676234d17f9",
-                title: "Canonical string reduction",
-                author: "Edsger W. Dijkstra",
-                url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-                likes: 12,
-                __v: 0
-        },
-        {
-                _id: "5a422b891b54a676234d17fa",
-                title: "First class tests",
-                author: "Robert C. Martin",
-                url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-                likes: 10,
-                __v: 0
-        },
-        {
-                _id: "5a422ba71b54a676234d17fb",
-                title: "TDD harms architecture",
-                author: "Robert C. Martin",
-                url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
-                likes: 0,
-                __v: 0
-        },
-        {
-                _id: "5a422bc61b54a676234d17fc",
-                title: "Type wars",
-                author: "Robert C. Martin",
-                url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
-                likes: 2,
-                __v: 0
-        }  
-]
 
 // setup data for the tests
 beforeEach(async () => {
         // empty the test database
         await Blog.deleteMany({})
         // create some test data in the db
-        await Blog.insertMany(initialBlogs)
+        await Blog.insertMany(testHelper.initialBlogs)
 })
 
 // test content-type is correct
@@ -75,20 +25,39 @@ test("blog list is returned as json", async () => {
 test("all blogs are returned", async () => {
         const response = await api.get("/api/blogs")
 
-        expect(response.body).toHaveLength(initialBlogs.length)
+        expect(response.body).toHaveLength(testHelper.initialBlogs.length)
 })
 
-// test that added blog post has an id, if not specified
-test("a blog post has id", async () => {
+// test that each blog post has an id
+test("blog posts have an id", async () => {
+        const response = await api.get("/api/blogs")
+        
+        for (var i = 0; i < response.body.length; i++) {
+                expect(response.body[i].id).toBeDefined()
+        }
+})
+
+test("a blog can be added and content matches after addition", async () => {
         const newBlog = {
                 title: "Space War",
                 author: "Robert C. Martin",
                 url: "https://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html",
                 likes: 50
         }
-        const response = await api.post("/api/blogs", newBlog)
-        console.log(response.body)
-        expect(response.body.id).toBeDefined()
+        
+        await api.post("/api/blogs")
+        .send(newBlog)
+        .expect(201)
+        .expect("Content-Type", /application\/json/)
+
+        // note: has to await here (inside the function does not work)
+        const blogsAfterAddition = await testHelper.blogsInDb()
+        const formattedBlogs = blogsAfterAddition.map(blog => {
+                return {title: blog.title, author: blog.author, url: blog.url, likes: blog.likes}
+        }) 
+
+        expect(blogsAfterAddition).toHaveLength(testHelper.initialBlogs.length + 1)
+        expect(formattedBlogs).toContainEqual(newBlog)
 })
 
 afterAll(() => {
