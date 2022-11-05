@@ -7,8 +7,14 @@ blogsRouter.get("/", async (request, response) => {
 })
 
 blogsRouter.post("/", async (request, response) => {
-        const savedBlog = await new Blog(request.body).save()
-        response.status(201).json(savedBlog)
+        // title and url mandatory
+        if (!(request.body.title || request.body.url)) {
+                response.status(400).end()
+        }
+        else {
+                const savedBlog = await new Blog(request.body).save()
+                response.status(201).json(savedBlog)
+        }
 })
 
 

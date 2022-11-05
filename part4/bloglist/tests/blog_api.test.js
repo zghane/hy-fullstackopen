@@ -79,6 +79,21 @@ test("an added blog has default value for likes", async () => {
         expect(addedBlog.likes).toBe(0)
 })
 
+test("add a new blog  with missing title and url requests in 400 BAD REQUEST", async () => {
+        const newBlog = {
+                author: "Robert C. Martin",
+        }
+
+        await api
+        .post("/api/blogs").send(newBlog)
+        .expect(400)
+
+        // check that the new blog was not added
+        const blogsAfterAddition = await testHelper.blogsInDb()
+        expect(blogsAfterAddition).toHaveLength(testHelper.initialBlogs.length)
+})
+
+
 afterAll(() => {
         mongoose.connection.close()
 })
