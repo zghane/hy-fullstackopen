@@ -93,7 +93,7 @@ test("add a new blog  with missing title and url requests in 400 BAD REQUEST", a
     expect(blogsAfterAddition).toHaveLength(testHelper.initialBlogs.length)
 })
 describe("deletion of a blog", () => {
-    test("succeeds with status code 204 if id is valid", async () => {
+    test("succeeds with status code 204, given a valid id", async () => {
         const blogsBeforeDeletion = await testHelper.blogsInDb()
         const blogToDelete = blogsBeforeDeletion[0]
 
@@ -109,6 +109,31 @@ describe("deletion of a blog", () => {
         expect(titles).not.toContain(blogToDelete.title)
     })
 })
+
+describe("modifying a blog", () => {
+    test("succeeds, given a valid id", async () => {
+        const blogsBeforeUpdating = await testHelper.blogsInDb()
+        const blogToUpdate = blogsBeforeUpdating[0]
+        const updatedBlog = {
+            title: "Updated",
+            likes: 1990
+        }
+
+        await api
+            .put(`/api/blogs/${blogToUpdate.id}`).send(updatedBlog)
+            .expect(200)
+
+        const blogsAfterUpdating = await testHelper.blogsInDb()
+        const blogs = blogsAfterUpdating.map(blog => {
+            return {title: blog.title, likes: blog.likes}
+        })
+
+        // length shouldn't have changed
+        expect(blogsAfterUpdating).toHaveLength(blogsBeforeUpdating.length)
+        expect(blogs).toContainEqual(updatedBlog)
+    })
+})
+
 
 afterAll(() => {
     mongoose.connection.close()
