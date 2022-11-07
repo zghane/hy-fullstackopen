@@ -27,8 +27,10 @@ const tokenExtractor = (request, response, next) => {
 // this should be registered after tokenExtractor
 const userExtractor = (request, response, next) => {
     const token = request.token // tokenExtractor should populate this
-    const decodedToken = jwt.verify(token, process.env.JWT_SIGN_SECRET)
-    request.user = decodedToken.id
+    if (token) {
+        const decodedToken = jwt.verify(token, process.env.JWT_SIGN_SECRET)
+        request.user = decodedToken.id
+    }
 
     next()
 }

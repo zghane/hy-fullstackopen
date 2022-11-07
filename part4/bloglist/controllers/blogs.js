@@ -2,13 +2,14 @@ const blogsRouter = require("express").Router()
 const Blog = require("../models/blog")
 const User = require("../models/user")
 const jwt = require("jsonwebtoken")
+const middleware = require("../utils/middleware")
 
 blogsRouter.get("/", async (request, response) => {
     const blogs = await Blog.find({})
     response.json(blogs)
 })
 
-blogsRouter.post("/", async (request, response) => {
+blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
     // title and url mandatory
     if (!request.body.title || !request.body.url) {
         response.status(400).end()
@@ -33,7 +34,7 @@ blogsRouter.post("/", async (request, response) => {
     response.status(201).json(savedBlog)
 })
 
-blogsRouter.delete("/:id", async (request, response) => {
+blogsRouter.delete("/:id", middleware.userExtractor, async (request, response) => {
     const blog = await Blog.findById(request.params.id)
     if (!blog) {
         return response.status(404).end()
@@ -54,7 +55,7 @@ blogsRouter.delete("/:id", async (request, response) => {
     response.status(204).end()
 })
 
-blogsRouter.put("/:id", async (request, response) => {
+blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
     const blog = await Blog.findById(request.params.id)
     if (!blog) {
         return response.status(404).end()
@@ -69,14 +70,14 @@ blogsRouter.put("/:id", async (request, response) => {
         return response.status(401).json({error: "not authorized to delete this blog"})
     }
 
-    const updatedBlog = {
+    const updatedBlogContent = {
         title: request.body.title,
         author: request.body.author,
         url: request.body.url,
         likes: request.body.likes
     }
-    const blog = await Blog.findOneAndUpdate({id: request.params.id}, updatedBlog, {new: true, runValidators: true, context: "query"})
-    if (blog) {
+    const updatedBlog = await Blog.findOneAndUpdate({id: request.params.id}, updatedBlogContent, {new: true, runValidators: true, context: "query"})
+    if (updatedBlog) {
         response.status(200).json(blog.toJSON())
     }
     else {

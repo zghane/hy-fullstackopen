@@ -17,9 +17,8 @@ app.use(cors())
 app.use(express.json())
 app.use(middleware.requestLogger)
 app.use(middleware.tokenExtractor) // add token to requests.token
-app.use(middleware.userExtractor)  // add userid to requests.user
 
-app.use("/api/blogs", blogsRouter)
+app.use("/api/blogs", blogsRouter) // add userid to requests.user
 app.use("/api/users", usersRouter)
 app.use("/api/login", loginRouter)
 
