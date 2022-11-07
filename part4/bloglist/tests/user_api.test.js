@@ -14,7 +14,8 @@ beforeEach(async () => {
     await User.insertMany(testHelper.initialUsers)
 })
 
-test("adding an user succeeds with a fresh username", async () => {
+describe("adding a new user", () => {
+    test("succeeds, given a fresh (unused) username", async () => {
     const usersBeforeAddition = await testHelper.usersInDb()
 
     const newUser = { 
@@ -33,23 +34,77 @@ test("adding an user succeeds with a fresh username", async () => {
     expect(usersAfterAddition).toHaveLength(usersBeforeAddition.length + 1)
     const usernames = usersAfterAddition.map(user => user.username)
     expect(usernames).toContain(newUser.username)
-})
+    })
 
-test("adding an user fails when username is already taken", async () => {
-    const usersBeforeAddition = await testHelper.usersInDb()
+    test("fails when username is already taken", async () => {
+        const usersBeforeAddition = await testHelper.usersInDb()
 
-    const newUser = { 
-        username: "john",
-        name: "John Blakes",
-        password: "abc123"
-    }
+        var newUser = testHelper.initialUsers[0]
+        newUser.password = "abc123"
 
-    await api
-        .post("/api/users")
-        .send(newUser)
-        .expect(400)
+        await api
+            .post("/api/users")
+            .send(newUser)
+            .expect(400)
 
-    const usersAfterAddition = await testHelper.usersInDb()
-    expect(usersAfterAddition).toHaveLength(usersBeforeAddition.length)
-    expect(usersAfterAddition).toEqual(usersBeforeAddition)
-})
+        const usersAfterAddition = await testHelper.usersInDb()
+        expect(usersAfterAddition).toHaveLength(usersBeforeAddition.length)
+        expect(usersAfterAddition).toEqual(usersBeforeAddition)
+    })
+
+    test("fails when password is too short", async () => {
+        const usersBeforeAddition = await testHelper.usersInDb()
+
+        const newUser = { 
+            username: "john",
+            name: "John Blakes",
+            password: "a"
+        }
+
+        await api
+            .post("/api/users")
+            .send(newUser)
+            .expect(400)
+
+        const usersAfterAddition = await testHelper.usersInDb()
+        expect(usersAfterAddition).toHaveLength(usersBeforeAddition.length)
+        expect(usersAfterAddition).toEqual(usersBeforeAddition)
+    })
+
+    test("fails when password is not given", async () => {
+        const usersBeforeAddition = await testHelper.usersInDb()
+
+        const newUser = { 
+            username: "john",
+            name: "John Blakes",
+        }
+
+        await api
+            .post("/api/users")
+            .send(newUser)
+            .expect(400)
+
+        const usersAfterAddition = await testHelper.usersInDb()
+        expect(usersAfterAddition).toHaveLength(usersBeforeAddition.length)
+        expect(usersAfterAddition).toEqual(usersBeforeAddition)
+    })
+
+
+    test("fails when username is not given", async () => {
+        const usersBeforeAddition = await testHelper.usersInDb()
+
+        const newUser = { 
+            name: "John Blakes",
+            password: "abc123"
+        }
+
+        await api
+            .post("/api/users")
+            .send(newUser)
+            .expect(400)
+
+        const usersAfterAddition = await testHelper.usersInDb()
+        expect(usersAfterAddition).toHaveLength(usersBeforeAddition.length)
+        expect(usersAfterAddition).toEqual(usersBeforeAddition)
+    })
+    })
