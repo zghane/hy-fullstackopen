@@ -55,6 +55,20 @@ blogsRouter.delete("/:id", async (request, response) => {
 })
 
 blogsRouter.put("/:id", async (request, response) => {
+    const blog = await Blog.findById(request.params.id)
+    if (!blog) {
+        return response.status(404).end()
+    }
+    if (!request.user) {
+        return response.status(401).json({error: "authorization token missing or invalid"})
+    }
+
+    const user = await User.findById(request.user) //request.user is added by userExtractor middleware
+    // check that user owns this blog
+    if (blog.user._id.toHexString() !== user.id) {
+        return response.status(401).json({error: "not authorized to delete this blog"})
+    }
+
     const updatedBlog = {
         title: request.body.title,
         author: request.body.author,
