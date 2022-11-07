@@ -2,6 +2,7 @@ const mongoose = require("mongoose")
 const supertest = require("supertest")
 const app = require("../app")
 const Blog = require("../models/blog")
+const User = require("../models/user")
 const testHelper = require("./test_helper")
 const api = supertest(app)
 
@@ -10,7 +11,9 @@ const api = supertest(app)
 beforeEach(async () => {
     // empty the test database
     await Blog.deleteMany({})
+    await User.deleteMany({})
     // create some test data in the db
+    await User.insertMany(testHelper.initialUsers)
     await Blog.insertMany(testHelper.initialBlogs)
 })
 
@@ -37,68 +40,128 @@ test("blog posts have an id", async () => {
     }
 })
 
-test("a blog can be added and content matches after addition", async () => {
-    const newBlog = {
-        title: "Space War",
-        author: "Robert C. Martin",
-        url: "https://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html",
-        likes: 50
-    }
+describe("adding a blog", () => {
+    test("succeeds when logged in and content matches after addition", async () => {
+        const userLogin = {
+            username: testHelper.initialUsers[0].username,
+            password: "dogsandcats"
+        }
+        const login = await api.post("/api/login")
+            .send(userLogin)
+            .expect(200)
+        const authorizationHeader = `bearer ${login.body.token}`
+        const newBlog = {
+            title: "Space War",
+            author: "Robert C. Martin",
+            url: "https://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html",
+            likes: 50
+        }
 
-    await api.post("/api/blogs")
-        .send(newBlog)
-        .expect(201)
-        .expect("Content-Type", /application\/json/)
+        await api.post("/api/blogs")
+            .send(newBlog)
+            .set("Authorization", authorizationHeader)
+            .expect(201)
+            .expect("Content-Type", /application\/json/)
 
-    // note: has to await here (inside the function does not work)
-    const blogsAfterAddition = await testHelper.blogsInDb()
-    const formattedBlogs = blogsAfterAddition.map(blog => {
-        return {title: blog.title, author: blog.author, url: blog.url, likes: blog.likes}
-    }) 
+        const blogsAfterAddition = await testHelper.blogsInDb()
+        const formattedBlogs = blogsAfterAddition.map(blog => {
+            return {title: blog.title, author: blog.author, url: blog.url, likes: blog.likes}
+        }) 
 
-    expect(blogsAfterAddition).toHaveLength(testHelper.initialBlogs.length + 1)
-    expect(formattedBlogs).toContainEqual(newBlog)
+        expect(blogsAfterAddition).toHaveLength(testHelper.initialBlogs.length + 1)
+        expect(formattedBlogs).toContainEqual(newBlog)
+    })
+
+    // test that likes always gets a value, by default 0 if not supplied
+    test("sets a default value for 'likes' when it's not explicitly set", async () => {
+        const userLogin = {
+            username: testHelper.initialUsers[0].username,
+            password: "dogsandcats"
+        }
+        const login = await api.post("/api/login")
+            .send(userLogin)
+            .expect(200)
+        const authorizationHeader = `bearer ${login.body.token}`
+        const newBlog = {
+            title: "Type wars",
+            author: "Robert C. Martin",
+            url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+        }
+
+        await api
+            .post("/api/blogs").send(newBlog)
+            .set("Authorization", authorizationHeader)
+            .expect(201)
+            .expect("Content-Type", /application\/json/)
+
+        const blogsAfterAddition = await testHelper.blogsInDb()
+        const addedBlog = await blogsAfterAddition.find(blog => blog.url === newBlog.url)
+        expect(addedBlog.likes).toBeDefined()
+        expect(addedBlog.likes).toBe(0)
+    })
+
+    test("fails if title and url are missing, with 400", async () => {
+        const userLogin = {
+            username: testHelper.initialUsers[0].username,
+            password: "dogsandcats"
+        }
+        const login = await api.post("/api/login")
+            .send(userLogin)
+            .expect(200)
+        const authorizationHeader = `bearer ${login.body.token}`
+        const newBlog = {
+            author: "Robert C. Martin",
+        }
+
+        await api
+            .post("/api/blogs").send(newBlog)
+            .set("Authorization", authorizationHeader)
+            .expect(400)
+
+        // check that the new blog was not added
+        const blogsAfterAddition = await testHelper.blogsInDb()
+        expect(blogsAfterAddition).toHaveLength(testHelper.initialBlogs.length)
+    })
+
+    test("fails if user is not logged in, with 401", async () => {
+        const newBlog = {
+            title: "Space War",
+            author: "Robert C. Martin",
+            url: "https://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html",
+            likes: 50
+        }
+
+        await api.post("/api/blogs")
+            .send(newBlog)
+            .expect(401)
+
+        const blogsAfterAddition = await testHelper.blogsInDb()
+        const formattedBlogs = blogsAfterAddition.map(blog => {
+            return {title: blog.title, author: blog.author, url: blog.url, likes: blog.likes}
+        }) 
+
+        expect(blogsAfterAddition).toHaveLength(testHelper.initialBlogs.length)
+        expect(formattedBlogs).not.toContainEqual(newBlog)
+    })
 })
 
-// test that likes always gets a value, by default 0 if not supplied
-test("an added blog has default value for likes", async () => {
-    const newBlog = {
-        title: "Type wars",
-        author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
-    }
-
-    await api
-        .post("/api/blogs").send(newBlog)
-        .expect(201)
-        .expect("Content-Type", /application\/json/)
-
-    const blogsAfterAddition = await testHelper.blogsInDb()
-    const addedBlog = await blogsAfterAddition.find(blog => blog.url === newBlog.url)
-    expect(addedBlog.likes).toBeDefined()
-    expect(addedBlog.likes).toBe(0)
-})
-
-test("add a new blog  with missing title and url requests in 400 BAD REQUEST", async () => {
-    const newBlog = {
-        author: "Robert C. Martin",
-    }
-
-    await api
-        .post("/api/blogs").send(newBlog)
-        .expect(400)
-
-    // check that the new blog was not added
-    const blogsAfterAddition = await testHelper.blogsInDb()
-    expect(blogsAfterAddition).toHaveLength(testHelper.initialBlogs.length)
-})
 describe("deletion of a blog", () => {
-    test("succeeds with status code 204, given a valid id", async () => {
+    test("succeeds if user is logged in given a valid blog id and user owns the blog, with 204", async () => {
+        const userLogin = {
+            username: testHelper.initialUsers[0].username,
+            password: "dogsandcats"
+        }
+        const login = await api.post("/api/login")
+            .send(userLogin)
+            .expect(200)
+        const authorizationHeader = `bearer ${login.body.token}`
         const blogsBeforeDeletion = await testHelper.blogsInDb()
+
         const blogToDelete = blogsBeforeDeletion[0]
 
         await api
             .delete(`/api/blogs/${blogToDelete.id}`)
+            .set("Authorization", authorizationHeader)
             .expect(204)
 
         const blogsAfterDeletion = await testHelper.blogsInDb()
@@ -111,7 +174,16 @@ describe("deletion of a blog", () => {
 })
 
 describe("modifying a blog", () => {
-    test("succeeds, given a valid id", async () => {
+    test("succeeds if user is logged in given a valid blog id and user owns the blog, with 200", async () => {
+        const userLogin = {
+            username: testHelper.initialUsers[0].username,
+            password: "dogsandcats"
+        }
+        const login = await api.post("/api/login")
+            .send(userLogin)
+            .expect(200)
+        const authorizationHeader = `bearer ${login.body.token}`
+
         const blogsBeforeUpdating = await testHelper.blogsInDb()
         const blogToUpdate = blogsBeforeUpdating[0]
         const updatedBlog = {
@@ -121,6 +193,7 @@ describe("modifying a blog", () => {
 
         await api
             .put(`/api/blogs/${blogToUpdate.id}`).send(updatedBlog)
+            .set("Authorization", authorizationHeader)
             .expect(200)
 
         const blogsAfterUpdating = await testHelper.blogsInDb()

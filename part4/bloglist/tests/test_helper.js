@@ -4,6 +4,7 @@ const Blog = require("../models/blog")
 const User = require("../models/user")
 
 // initial test data
+// all blogs owned by user "kate"
 const initialBlogs = [
     {
         _id: "5a422a851b54a676234d17f7",
@@ -11,7 +12,8 @@ const initialBlogs = [
         author: "Michael Chan",
         url: "https://reactpatterns.com/",
         likes: 7,
-        __v: 0
+        __v: 0,
+        user: "136911ec5b57f1d783cbd24f"
     },
     {
         _id: "5a422aa71b54a676234d17f8",
@@ -19,7 +21,9 @@ const initialBlogs = [
         author: "Edsger W. Dijkstra",
         url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
         likes: 5,
-        __v: 0
+        __v: 0,
+        user: "136911ec5b57f1d783cbd24f"
+
     },
     {
         _id: "5a422b3a1b54a676234d17f9",
@@ -27,7 +31,9 @@ const initialBlogs = [
         author: "Edsger W. Dijkstra",
         url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
         likes: 12,
-        __v: 0
+        __v: 0,
+        user: "136911ec5b57f1d783cbd24f"
+
     },
     {
         _id: "5a422b891b54a676234d17fa",
@@ -35,7 +41,9 @@ const initialBlogs = [
         author: "Robert C. Martin",
         url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
         likes: 10,
-        __v: 0
+        __v: 0,
+        user: "136911ec5b57f1d783cbd24f"
+
     },
     {
         _id: "5a422ba71b54a676234d17fb",
@@ -43,20 +51,24 @@ const initialBlogs = [
         author: "Robert C. Martin",
         url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
         likes: 0,
-        __v: 0
+        __v: 0,
+        user: "136911ec5b57f1d783cbd24f"
+
     },
 ]
 const initialUsers = [
     {
-        username: "mike",
-        name: "Mike Johnson",
-        passwordHash: "mysecret"
-    },
-    {
         username: "kate",
         name: "Kate Moynes",
-        passwordHash: "dogsandcats"
-    }
+        passwordHash: "$2b$10$apA6HwilZWhtyngVwmvJMurVCALkqCwxmnQRwSf5IwLLrVZPO7xfC", // "dogsandcats"
+        _id: "136911ec5b57f1d783cbd24f"
+    },
+    {
+        username: "mike",
+        name: "Mike Johnson",
+        passwordHash: "$2b$10$cpAt.bKAO4lhlN3hhUBzlek/gNPox6e4x.EBZEbsYdpMCMv6Rt21C", //"mysecret"
+        _id: "636911ec5b57f1d783cbd24e"
+    },
 ]
 
 
