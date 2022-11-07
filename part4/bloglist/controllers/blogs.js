@@ -1,6 +1,18 @@
 const blogsRouter = require("express").Router()
 const Blog = require("../models/blog")
 const User = require("../models/user")
+const jwt = require("jsonwebtoken")
+
+// extract jwt token from a request
+const getTokenFrom = request => {
+    // token is presented in the authorization header,
+    // e.g. Authorization: bearer xxx
+    const authorization = request.get("authorization")
+    if (authorization && authorization.toLowerCase().startsWith("bearer")) {
+        return authorization.substring(7)
+    }
+    return null
+}
 
 blogsRouter.get("/", async (request, response) => {
     const blogs = await Blog.find({})
@@ -8,14 +20,26 @@ blogsRouter.get("/", async (request, response) => {
 })
 
 blogsRouter.post("/", async (request, response) => {
+
+
     // title and url mandatory
-    if (!(request.body.title || request.body.url)) {
+    if (!request.body.title || !request.body.url) {
         response.status(400).end()
     }
     else {
-        // try to find the user given
-        //const user = await User.findById(request.body.userId)
-        const user = await User.findOne({})
+        const token = getTokenFrom(request)
+        // check if any token is given
+        if (!token) {
+            return response.status(401).json({error: "authorization token missing or invalid"})
+        }
+        // check if given token is valid
+        const decodedToken = jwt.verify(token, process.env.JWT_SIGN_SECRET)
+        if (!decodedToken.id) {
+            return response.status(401).json({error: "authorization token missing or invalid"})
+        }
+
+        // user corresponding to the token
+        const user = await User.findById(decodedToken.id)
         const newBlog = {
             title: request.body.title,
             author: request.body.author,
