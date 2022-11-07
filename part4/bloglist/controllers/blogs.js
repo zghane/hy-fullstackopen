@@ -3,17 +3,6 @@ const Blog = require("../models/blog")
 const User = require("../models/user")
 const jwt = require("jsonwebtoken")
 
-// extract jwt token from a request
-const getTokenFrom = request => {
-    // token is presented in the authorization header,
-    // e.g. Authorization: bearer xxx
-    const authorization = request.get("authorization")
-    if (authorization && authorization.toLowerCase().startsWith("bearer")) {
-        return authorization.substring(7)
-    }
-    return null
-}
-
 blogsRouter.get("/", async (request, response) => {
     const blogs = await Blog.find({})
     response.json(blogs)
@@ -21,13 +10,12 @@ blogsRouter.get("/", async (request, response) => {
 
 blogsRouter.post("/", async (request, response) => {
 
-
     // title and url mandatory
     if (!request.body.title || !request.body.url) {
         response.status(400).end()
     }
     else {
-        const token = getTokenFrom(request)
+        const token = request.token // tokenExtractor middleware adds this
         // check if any token is given
         if (!token) {
             return response.status(401).json({error: "authorization token missing or invalid"})
