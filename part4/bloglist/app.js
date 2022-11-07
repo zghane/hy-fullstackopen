@@ -16,7 +16,8 @@ mongoose.connect(config.MONGODB_URI)
 app.use(cors())
 app.use(express.json())
 app.use(middleware.requestLogger)
-app.use(middleware.tokenExtractor) // extract token from requests
+app.use(middleware.tokenExtractor) // add token to requests.token
+app.use(middleware.userExtractor)  // add userid to requests.user
 
 app.use("/api/blogs", blogsRouter)
 app.use("/api/users", usersRouter)
