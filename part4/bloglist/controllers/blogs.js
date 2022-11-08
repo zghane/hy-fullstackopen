@@ -6,16 +6,16 @@ const middleware = require("../utils/middleware")
 
 blogsRouter.get("/", async (request, response) => {
     const blogs = await Blog.find({})
-    response.json(blogs)
+    return response.status(200).json(blogs)
 })
 
 blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
     // title and url mandatory
-    if (!request.body.title || !request.body.url) {
-        response.status(400).end()
-    }
     if (!request.user) {
         return response.status(401).json({error: "authorization token missing or invalid"})
+    }
+    if (!request.body.title || !request.body.url) {
+        return response.status(400).end()
     }
 
     // user corresponding to the token
@@ -31,7 +31,7 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
     // add the new blog to the user's list of blogs
     user.blogs = user.blogs.concat(savedBlog.id)
     await user.save()
-    response.status(201).json(savedBlog)
+    return response.status(201).json(savedBlog)
 })
 
 blogsRouter.delete("/:id", middleware.userExtractor, async (request, response) => {
@@ -52,7 +52,7 @@ blogsRouter.delete("/:id", middleware.userExtractor, async (request, response) =
     // remove the blog from the user's list of blogs
     user.blogs = user.blogs.filter(blog => blog.id !== request.params.id)
     await user.save()
-    response.status(204).end()
+    return response.status(204).end()
 })
 
 blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
@@ -78,10 +78,10 @@ blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
     }
     const updatedBlog = await Blog.findOneAndUpdate({id: request.params.id}, updatedBlogContent, {new: true, runValidators: true, context: "query"})
     if (updatedBlog) {
-        response.status(200).json(blog.toJSON())
+        return response.status(200).json(blog.toJSON())
     }
     else {
-        response.status(400).end()
+        return response.status(400).end()
     }
 })
 
