@@ -10,6 +10,7 @@ const App = () => {
     const [password, setPassword] = useState("")
     const [user, setUser] = useState(null)
     const [errorMessage, setErrorMessage] = useState("")
+    const [newBlog, setNewBlog] = useState({title: "", author: "", url: ""})
 
 
     useEffect(() => {
@@ -24,6 +25,7 @@ const App = () => {
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON)
             setUser(user)
+            blogService.setToken(user.token)
         }
     }, [])
 
@@ -57,6 +59,28 @@ const App = () => {
             </div>
         )
     }
+    const blogForm = () => {
+        return (
+            <div>
+            <h2>create new</h2>
+            <form onSubmit={handleCreateBlog}>
+            <div>
+            title
+            <input type="text" value={newBlog.title} name="Title" onChange={({target}) => setNewBlog({...newBlog, title:target.value})} />
+            </div>
+            <div>
+            author
+            <input type="text" value={newBlog.author} name="Author" onChange={({target}) => setNewBlog({...newBlog, author:target.value})} />
+            </div>
+            <div>
+            url
+            <input type="text" value={newBlog.url} name="Url" onChange={({target}) => setNewBlog({...newBlog, url:target.value})} />
+            </div>
+            <button type="submit">create</button>
+            </form>
+            </div>
+        )
+    }
     // display error message for time ms
     const displayErrorMessage = (message, time=5000) => {
         setErrorMessage(message)
@@ -65,6 +89,22 @@ const App = () => {
         }, time)
     }
 
+    const handleCreateBlog = async (event) => {
+        event.preventDefault()
+        try {
+            const blog = await blogService.create({
+                title: newBlog.title,
+                author: newBlog.author,
+                url: newBlog.url,
+            })  
+            setNewBlog({title: null, author: null, url: null})
+            setBlogs(blogs.concat(blog))
+            }
+        catch (exception) {
+            displayErrorMessage("Failed to create the entry")
+        }
+    }
+    
     const handleLogin = async (event) => {
         event.preventDefault()
         try {
@@ -74,6 +114,7 @@ const App = () => {
             })
             // store the user in browser's local storage so it's persistent between page reloads
             window.localStorage.setItem("loggedInUser", JSON.stringify(user))
+            blogService.setToken(user.token)
             setUser(user)
             setUsername("")
             setPassword("")
@@ -91,6 +132,7 @@ const App = () => {
 
         <ErrorMessage message={errorMessage} />
         {user === null && loginForm()}
+        {user !== null && blogForm()}
         {user !== null && blogsList()}
         </div>
     )
