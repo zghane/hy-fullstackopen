@@ -4,7 +4,7 @@ const ErrorMessage = ({ message}) => {
         }
 
         return (
-                <div>
+                <div className="message">
                         {message}
                 </div>
         )

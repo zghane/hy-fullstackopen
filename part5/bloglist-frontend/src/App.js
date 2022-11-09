@@ -2,14 +2,16 @@ import { useState, useEffect } from "react"
 import Blog from "./components/Blog"
 import blogService from "./services/blogs"
 import loginService from "./services/login"
-import ErrorMessage from "./components/ErrorMessage"
+import Notification from "./components/Notification"
+
+import "./index.css"
 
 const App = () => {
     const [blogs, setBlogs] = useState([])
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [user, setUser] = useState(null)
-    const [errorMessage, setErrorMessage] = useState("")
+    const [notification, setNotification] = useState("")
     const [newBlog, setNewBlog] = useState({title: "", author: "", url: ""})
 
 
@@ -81,11 +83,11 @@ const App = () => {
             </div>
         )
     }
-    // display error message for time ms
-    const displayErrorMessage = (message, time=5000) => {
-        setErrorMessage(message)
+    // display message for time ms
+    const displayNotification = (message, time=5000) => {
+        setNotification(message)
         setTimeout(() => {
-            setErrorMessage({message: null})
+            setNotification("")
         }, time)
     }
 
@@ -97,11 +99,12 @@ const App = () => {
                 author: newBlog.author,
                 url: newBlog.url,
             })  
-            setNewBlog({title: null, author: null, url: null})
             setBlogs(blogs.concat(blog))
+            displayNotification(`A new blog "${blog.title}" by ${blog.author} added`)
+            setNewBlog({title: "", author: "", url: ""})
             }
         catch (exception) {
-            displayErrorMessage("Failed to create the entry")
+            displayNotification("Failed to create the entry")
         }
     }
     
@@ -120,7 +123,7 @@ const App = () => {
             setPassword("")
         }
         catch (exception) {
-            displayErrorMessage("Wrong credentials")
+            displayNotification("Wrong credentials")
         }
 
     }
@@ -130,7 +133,7 @@ const App = () => {
     return (
         <div>
 
-        <ErrorMessage message={errorMessage} />
+        {notification !== "" && <Notification message={notification} />}
         {user === null && loginForm()}
         {user !== null && blogForm()}
         {user !== null && blogsList()}
