@@ -15,7 +15,6 @@ const App = () => {
     const [password, setPassword] = useState("")
     const [user, setUser] = useState(null)
     const [notification, setNotification] = useState("")
-    const [newBlog, setNewBlog] = useState({title: "", author: "", url: ""})
 
 
     useEffect(() => {
@@ -54,8 +53,7 @@ const App = () => {
         }, time)
     }
 
-    const handleCreateBlog = async (event) => {
-        event.preventDefault()
+    const addBlog = async (newBlog) => {
         try {
             const blog = await blogService.create({
                 title: newBlog.title,
@@ -64,8 +62,7 @@ const App = () => {
             })  
             setBlogs(blogs.concat(blog))
             displayNotification(`A new blog "${blog.title}" by ${blog.author} added`)
-            setNewBlog({title: "", author: "", url: ""})
-            }
+        }
         catch (exception) {
             displayNotification("Failed to create the entry")
         }
@@ -90,13 +87,8 @@ const App = () => {
         }
 
     }
-
-    // show the login form if the user is not logged in
-    // otherwise, show the list of blogs
-    return (
-        <div>
-
-        {notification !== "" && <Notification message={notification} />}
+    const loginForm = () => {
+        return ( 
         <Togglable buttonLabel="login">
             <LoginForm
                 onSubmit={handleLogin}
@@ -106,18 +98,27 @@ const App = () => {
                 onChangePassword={({target}) => setPassword(target.value)}
         />
         </Togglable>
-        {user !== null && 
+        )
+    }
+
+    const blogsForm = () => {
+        return (
         <Togglable buttonLabel="create new blog">
             <BlogForm
-                newBlog={newBlog}
-                onChangeTitle={({target}) => setNewBlog({...newBlog, title: target.value})}
-                onChangeAuthor={({target}) => setNewBlog({...newBlog, author: target.value})}
-                onChangeUrl={({target}) => setNewBlog({...newBlog, url: target.value})}
-                onSubmit={handleCreateBlog}
+                createBlog={addBlog}
             />
             </Togglable>
-        }
-                
+        )
+    }
+
+    // show the login form if the user is not logged in
+    // otherwise, show the list of blogs
+    return (
+        <div>
+
+        {notification !== "" && <Notification message={notification} />}
+        {user === null && loginForm()}
+        {user !== null && blogsForm()}
         {user !== null && blogsList()}
         </div>
     )
