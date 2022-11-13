@@ -105,16 +105,8 @@ const App = () => {
             <div>
             <h2>blogs</h2>
             <p>{user.name} logged in</p>
-            {blogs.map(blog => {
-                return (
-                    <div>
+            {blogs.map(blog => 
                     <Blog key={blog.id} blog={blog} />
-                        <Togglable buttonLabel="view">
-                            <BlogDetails key={blog.id} blog={blog} />
-                        </Togglable>
-                    </div>
-                )
-            }
             )}
             </div>
         )
