@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import Blog from "./components/Blog"
+import BlogDetails from "./components/BlogDetails"
 import blogService from "./services/blogs"
 import loginService from "./services/login"
 import Notification from "./components/Notification"
@@ -33,18 +34,6 @@ const App = () => {
         }
     }, [])
 
-    // list of blogs
-    const blogsList = () => {
-        return (
-            <div>
-            <h2>blogs</h2>
-            <p>{user.name} logged in</p>
-            {blogs.map(blog =>
-                <Blog key={blog.id} blog={blog} />
-            )}
-            </div>
-        )
-    }
     // display message for time ms
     const displayNotification = (message, time=5000) => {
         setNotification(message)
@@ -108,6 +97,26 @@ const App = () => {
                 createBlog={addBlog}
             />
             </Togglable>
+        )
+    }
+    // list of blogs
+    const blogsList = () => {
+        return (
+            <div>
+            <h2>blogs</h2>
+            <p>{user.name} logged in</p>
+            {blogs.map(blog => {
+                return (
+                    <div>
+                    <Blog key={blog.id} blog={blog} />
+                        <Togglable buttonLabel="view">
+                            <BlogDetails key={blog.id} blog={blog} />
+                        </Togglable>
+                    </div>
+                )
+            }
+            )}
+            </div>
         )
     }
 
