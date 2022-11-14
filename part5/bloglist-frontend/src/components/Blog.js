@@ -16,12 +16,12 @@ const Blog = ({ blog, updateBlog, deleteBlog}) => {
     //
     const BlogDetailsView = ({blog}) => {
         return (
-        <>
-        <p>{blog.url}</p>
-        <p>likes {blog.likes}<button onClick={handleLike}>like</button></p>
-        <p>{blog.user}</p>
-        <button onClick={handleDelete}>delete</button>
-        </>
+            <>
+                <p>{blog.url}</p>
+                <p>likes {blog.likes}<button onClick={handleLike}>like</button></p>
+                <p>{blog.user}</p>
+                <button onClick={handleDelete}>delete</button>
+            </>
         )
     }
 
@@ -29,17 +29,17 @@ const Blog = ({ blog, updateBlog, deleteBlog}) => {
     const blogStyle = {
         paddingTop: 10,
         paddingLeft: 2,
-        border: 'solid',
+        border: "solid",
         borderWidth: 1,
         marginBottom: 5
     }
     return (
         <div style={blogStyle}>
-        {blog.title} {blog.author}
-        <Togglable buttonLabel="view">
-            <BlogDetailsView blog={blog}/>
-        </Togglable>
-        </div>  
+            {blog.title} {blog.author}
+            <Togglable buttonLabel="view">
+                <BlogDetailsView blog={blog}/>
+            </Togglable>
+        </div>
     )
 }
 

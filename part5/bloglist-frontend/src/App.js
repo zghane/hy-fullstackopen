@@ -20,10 +20,10 @@ const App = () => {
     useEffect(() => {
         blogService.getAll().then(blogs =>
             setBlogs( blogs )
-        )  
+        )
     }, [])
 
-    // get the user's data from local storage, if available
+    // get the user"s data from local storage, if available
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem("loggedInUser")
         if (loggedUserJSON) {
@@ -47,7 +47,7 @@ const App = () => {
                 title: newBlog.title,
                 author: newBlog.author,
                 url: newBlog.url,
-            })  
+            })
             setBlogs(blogs.concat(blog))
             displayNotification(`A new blog "${blog.title}" by ${blog.author} added`)
         }
@@ -58,13 +58,13 @@ const App = () => {
     const updateBlog = async (newBlog) => {
         try {
             const updatedBlog = await blogService.update(
-                newBlog.id, 
+                newBlog.id,
                 {title: newBlog.title,
-                author: newBlog.author,
-                url: newBlog.url,
-                likes: newBlog.likes,
-                user: newBlog.user}
-            )  
+                    author: newBlog.author,
+                    url: newBlog.url,
+                    likes: newBlog.likes,
+                    user: newBlog.user}
+            )
             setBlogs(blogs.filter(blog => blog.title !== updatedBlog.title).concat(newBlog))
             displayNotification(`Updated blog "${updatedBlog.title}" details`)
         }
@@ -90,7 +90,7 @@ const App = () => {
                 username,
                 password
             })
-            // store the user in browser's local storage so it's persistent between page reloads
+            // store the user in browser"s local storage so it"s persistent between page reloads
             window.localStorage.setItem("loggedInUser", JSON.stringify(user))
             blogService.setToken(user.token)
             setUser(user)
@@ -103,25 +103,25 @@ const App = () => {
 
     }
     const loginForm = () => {
-        return ( 
-        <Togglable buttonLabel="login">
-            <LoginForm
-                onSubmit={handleLogin}
-                username={username}
-                password={password}
-                onChangeUsername={({target}) => setUsername(target.value)}
-                onChangePassword={({target}) => setPassword(target.value)}
-        />
-        </Togglable>
+        return (
+            <Togglable buttonLabel="login">
+                <LoginForm
+                    onSubmit={handleLogin}
+                    username={username}
+                    password={password}
+                    onChangeUsername={({target}) => setUsername(target.value)}
+                    onChangePassword={({target}) => setPassword(target.value)}
+                />
+            </Togglable>
         )
     }
 
     const blogsForm = () => {
         return (
-        <Togglable buttonLabel="create new blog">
-            <BlogForm
-                createBlog={addBlog}
-            />
+            <Togglable buttonLabel="create new blog">
+                <BlogForm
+                    createBlog={addBlog}
+                />
             </Togglable>
         )
     }
@@ -129,11 +129,11 @@ const App = () => {
     const blogsList = () => {
         return (
             <div>
-            <h2>blogs</h2>
-            <p>{user.name} logged in</p>
-            {blogs.sort( (blog1,blog2) => blog1.likes > blog2.likes).map(blog => 
+                <h2>blogs</h2>
+                <p>{user.name} logged in</p>
+                {blogs.sort( (blog1,blog2) => blog1.likes > blog2.likes).map(blog =>
                     <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog}/>
-            )}
+                )}
             </div>
         )
     }
@@ -142,11 +142,10 @@ const App = () => {
     // otherwise, show the list of blogs
     return (
         <div>
-
-        {notification !== "" && <Notification message={notification} />}
-        {user === null && loginForm()}
-        {user !== null && blogsForm()}
-        {user !== null && blogsList()}
+            {notification !== "" && <Notification message={notification} />}
+            {user === null && loginForm()}
+            {user !== null && blogsForm()}
+            {user !== null && blogsList()}
         </div>
     )
 }
