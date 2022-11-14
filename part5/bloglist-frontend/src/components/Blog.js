@@ -1,7 +1,12 @@
 import Togglable from "./Togglable"
 
-const Blog = ({blog}) => {
+const Blog = ({blog, updateBlog}) => {
 
+    // handle clicking the "like" button
+    const handleLike = () => {
+        const updatedBlog = {...blog, likes: blog.likes + 1}
+        updateBlog(updatedBlog)
+    }
     // basic view 
     const BlogBasicView = ({blog}) => {
         
@@ -12,7 +17,7 @@ const Blog = ({blog}) => {
         return (
         <>
         <p>{blog.url}</p>
-        <p>likes {blog.likes}<button>like</button></p>
+        <p>likes {blog.likes}<button onClick={handleLike}>like</button></p>
         <p>{blog.user}</p>
         </>
         )

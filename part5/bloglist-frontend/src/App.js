@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import Blog from "./components/Blog"
-import BlogDetails from "./components/BlogDetails"
 import blogService from "./services/blogs"
 import loginService from "./services/login"
 import Notification from "./components/Notification"
@@ -56,6 +55,23 @@ const App = () => {
             displayNotification("Failed to create the entry")
         }
     }
+    const updateBlog = async (newBlog) => {
+        try {
+            const updatedBlog = await blogService.update(
+                newBlog.id, 
+                {title: newBlog.title,
+                author: newBlog.author,
+                url: newBlog.url,
+                likes: newBlog.likes,
+                user: newBlog.user}
+            )  
+            setBlogs(blogs.filter(blog => blog.title !== updatedBlog.title).concat(newBlog))
+            displayNotification(`Updated blog "${updatedBlog.title}" details`)
+        }
+        catch (exception) {
+            displayNotification("Failed to update the entry")
+        }
+    }
     
     const handleLogin = async (event) => {
         event.preventDefault()
@@ -106,7 +122,7 @@ const App = () => {
             <h2>blogs</h2>
             <p>{user.name} logged in</p>
             {blogs.map(blog => 
-                    <Blog key={blog.id} blog={blog} />
+                    <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
             )}
             </div>
         )
