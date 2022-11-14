@@ -1,15 +1,16 @@
 import Togglable from "./Togglable"
 
-const Blog = ({blog, updateBlog}) => {
+const Blog = ({ blog, updateBlog, deleteBlog}) => {
 
     // handle clicking the "like" button
     const handleLike = () => {
         const updatedBlog = {...blog, likes: blog.likes + 1}
         updateBlog(updatedBlog)
     }
-    // basic view 
-    const BlogBasicView = ({blog}) => {
-        
+    // handle clicking the "delete" button
+    //
+    const handleDelete = () => {
+        deleteBlog(blog)
     }
     // more detailed view of an individual blog entry
     //
@@ -19,6 +20,7 @@ const Blog = ({blog, updateBlog}) => {
         <p>{blog.url}</p>
         <p>likes {blog.likes}<button onClick={handleLike}>like</button></p>
         <p>{blog.user}</p>
+        <button onClick={handleDelete}>delete</button>
         </>
         )
     }

@@ -72,7 +72,17 @@ const App = () => {
             displayNotification("Failed to update the entry")
         }
     }
-    
+    const deleteBlog = async (blog) => {
+        try {
+            await blogService.remove(blog.id)
+            setBlogs(blogs.filter(blogE => blogE.id !== blog.id))
+            displayNotification(`Removed blog "${blog.title}" by ${blog.author}`)
+        }
+        catch (exception) {
+            console.log(exception)
+            displayNotification("Failed to remove the blog")
+        }
+    }
     const handleLogin = async (event) => {
         event.preventDefault()
         try {
@@ -122,7 +132,7 @@ const App = () => {
             <h2>blogs</h2>
             <p>{user.name} logged in</p>
             {blogs.sort( (blog1,blog2) => blog1.likes > blog2.likes).map(blog => 
-                    <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+                    <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog}/>
             )}
             </div>
         )
