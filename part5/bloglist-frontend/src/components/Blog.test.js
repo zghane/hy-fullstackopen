@@ -41,3 +41,21 @@ test("Url and likes are rendered when a blog's 'view' button is clicked", async 
     expect(likes).toBeDefined()
 })
 
+test("clicking the 'like' button twice calls event handler twice", async () => {
+    const blog = {
+        title: "On entropy",
+        author: "Jason Higgs",
+        url: "www.jhiggs.com",
+        likes: 581
+    }
+
+    const mockHandler = jest.fn()
+
+    render(<Blog blog={blog} updateBlog={mockHandler}/>)
+
+    const user = userEvent.setup()
+    const button = screen.getByText("like")
+    for(var i=0;i<2;i++) await user.click(button)
+
+    expect(mockHandler.mock.calls).toHaveLength(2)
+})
