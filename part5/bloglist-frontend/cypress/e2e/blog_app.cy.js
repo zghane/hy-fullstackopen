@@ -32,4 +32,31 @@ describe("Blog app", function() {
         cy.contains("Wrong credentials")
         cy.should("not.contain", "logged in")
     })
+
+    describe("When logged in", function() {
+        beforeEach(function() {
+            const user = {
+                username: "testuser",
+                password: "testtest"
+            }
+            cy.login(user)
+        })
+
+        it("A blog can be created", function() {
+            const blog = {
+                title: "TestTitle",
+                author: "TestAUthor",
+                url: "https://test.com"
+            }
+            cy.contains("create new blog").click()
+            cy.get("#inputTitle").type(blog.title)
+            cy.get("#inputAuthor").type(blog.author)
+            cy.get("#inputUrl").type(blog.url)
+
+            cy.get("#createButton").click()
+
+            cy.contains(`${blog.title} ${blog.author}`)
+
+        })
     })
+})
