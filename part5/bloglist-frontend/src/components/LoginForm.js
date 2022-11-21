@@ -7,13 +7,13 @@ const LoginForm = ({onSubmit, username, password, onChangeUsername, onChangePass
             <form onSubmit={onSubmit}>
                 <div>
                 username
-                    <input type="text" value={username} name="Username" onChange={onChangeUsername} />
+                    <input id="inputUsername" type="text" value={username} name="Username" onChange={onChangeUsername} />
                 </div>
                 <div>
                 password
-                    <input type="text" value={password} name="Password" onChange={onChangePassword} />
+                    <input id="inputPassword" type="text" value={password} name="Password" onChange={onChangePassword} />
                 </div>
-                <button type="submit">login</button>
+                <button id="loginButton" type="submit">login</button>
             </form>
         </div>
     )
