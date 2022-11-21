@@ -18,7 +18,7 @@ const Blog = ({ blog, updateBlog, deleteBlog}) => {
         return (
             <>
                 <p>{blog.url}</p>
-                <p>likes {blog.likes}<button onClick={handleLike}>like</button></p>
+                <p>likes {blog.likes}<button id="likeButton" onClick={handleLike}>like</button></p>
                 <p>{blog.user}</p>
                 <button onClick={handleDelete}>delete</button>
             </>

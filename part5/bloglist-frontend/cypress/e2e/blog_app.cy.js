@@ -39,13 +39,14 @@ describe("Blog app", function() {
                 username: "testuser",
                 password: "testtest"
             }
+
             cy.login(user)
         })
 
         it("A blog can be created", function() {
             const blog = {
                 title: "TestTitle",
-                author: "TestAUthor",
+                author: "TestAuthor",
                 url: "https://test.com"
             }
             cy.contains("create new blog").click()
@@ -58,5 +59,26 @@ describe("Blog app", function() {
             cy.contains(`${blog.title} ${blog.author}`)
 
         })
+        it("A blog can be liked", function() {
+            const blog = {
+                title: "TestTitle",
+                author: "TestAuthor",
+                url: "https://test.com"
+            }
+            cy.contains("create new blog").click()
+            cy.get("#inputTitle").type(blog.title)
+            cy.get("#inputAuthor").type(blog.author)
+            cy.get("#inputUrl").type(blog.url)
+
+            cy.get("#createButton").click()
+
+            cy.contains(`${blog.title} ${blog.author}`)
+            cy.contains("view").click()
+
+            cy.contains("likes 0")
+            cy.get("#likeButton").click()
+            cy.contains("likes 1") 
+        })
+
     })
 })
