@@ -48,7 +48,7 @@ const App = () => {
                 author: newBlog.author,
                 url: newBlog.url,
             })
-            setBlogs(blogs.concat(blog))
+            setBlogs(blogs.concat(blog).sort((blog1,blog2) => blog1.likes > blog2.likes))
             displayNotification(`A new blog "${blog.title}" by ${blog.author} added`)
         }
         catch (exception) {
@@ -65,7 +65,8 @@ const App = () => {
                     likes: newBlog.likes,
                     user: newBlog.user}
             )
-            setBlogs(blogs.filter(blog => blog.title !== updatedBlog.title).concat(newBlog))
+            setBlogs(blogs.filter(blog => blog.title !== updatedBlog.title).concat(newBlog).sort((blog1,blog2) => blog2.likes - blog1.likes))
+
             displayNotification(`Updated blog "${updatedBlog.title}" details`)
         }
         catch (exception) {
@@ -131,7 +132,7 @@ const App = () => {
             <div>
                 <h2>blogs</h2>
                 <p>{user.name} logged in</p>
-                {blogs.sort( (blog1,blog2) => blog1.likes > blog2.likes).map(blog =>
+                {blogs.sort((blog1,blog2) => blog2.likes - blog1.likes).map(blog =>
                     <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog}/>
                 )}
             </div>
