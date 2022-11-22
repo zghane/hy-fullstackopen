@@ -100,6 +100,44 @@ describe("Blog app", function() {
             cy.get("body").should("not.contain", `${blog.title} ${blog.author}`)
 
         })
+        it("Blogs are in descending order by likes", function() {
+            // create two test blogs with different amount of likes
+            const blog = {
+                title: "TestTitle",
+                author: "TestAuthor",
+                url: "https://test.com",
+            }
+            const blog2 = {
+                title: "TestTitle2",
+                author: "TestAuthor2",
+                url: "https://test2.com",
+            }
+            cy.contains("create new blog").click()
+            cy.get("#inputTitle").type(blog.title)
+            cy.get("#inputAuthor").type(blog.author)
+            cy.get("#inputUrl").type(blog.url)
+            cy.get("#createButton").click()
+            cy.contains(`${blog.title} ${blog.author}`)
+
+            // the form should still be visible
+            cy.get("#inputTitle").clear()
+            cy.get("#inputAuthor").clear()
+            cy.get("#inputUrl").clear()
+            cy.get("#inputTitle").type(blog2.title)
+            cy.get("#inputAuthor").type(blog2.author)
+            cy.get("#inputUrl").type(blog2.url)
+            cy.get("#createButton").click()
+            cy.contains(`${blog.title} ${blog.author}`)
+
+            // add 1 like to the second blog
+            cy.contains(`${blog2.title} ${blog2.author}`).contains("view").click()
+            cy.get(".blog").eq(1).find("#likeButton").should("be.visible").click()
+            // updating the order takes a while sometimes
+            cy.wait(1000)
+            cy.get(".blog").eq(0).should("contain", `${blog2.title} ${blog2.author}`)
+            cy.get(".blog").eq(1).should("contain", `${blog.title} ${blog.author}`)
+
+        })
 
     })
 })

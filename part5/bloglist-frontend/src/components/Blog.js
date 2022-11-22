@@ -34,7 +34,7 @@ const Blog = ({ blog, updateBlog, deleteBlog}) => {
         marginBottom: 5
     }
     return (
-        <div style={blogStyle}>
+        <div style={blogStyle} className="blog">
             {blog.title} {blog.author}
             <Togglable buttonLabel="view">
                 <BlogDetailsView blog={blog}/>
